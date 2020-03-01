@@ -23,3 +23,10 @@
    5) Следуем инструкциям http://fkn.ktu10.com/?q=node/9428
 
 Удачной разработки!
+
+
+ALTER TABLE `articles` 
+    ADD `is_active` 
+        TINYINT(1) NOT NULL DEFAULT 1 
+            AFTER `content`
+                -- Поле для контроля статуса отображения статьи

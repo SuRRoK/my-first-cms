@@ -160,15 +160,20 @@ class Article
     * @return Array|false Двух элементный массив: results => массив объектов Article; totalRows => общее количество строк
     */
     public static function getList($numRows=1000000,
-            $categoryId=null, $order="publicationDate DESC")
+            $categoryId=null, $allArticles = true, $order="publicationDate DESC")
     {
         $conn = new PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);
-        $categoryClause = $categoryId ? " WHERE categoryId = :categoryId" : "";
-        $trace = debug_backtrace();
-        $activeArticlesFilter = stripos($trace[1]['file'], 'admin') ? "" : " WHERE is_active = 1";
+        $categoryClause = $categoryId ? "categoryId = :categoryId" : "";
+        $activeClause = !$allArticles ? "is_active = 1" : "";
+        $filter = '';
+        if ($categoryClause && $activeClause) {
+            $filter = "WHERE $categoryClause AND $activeClause";
+        } elseif ($categoryClause || $activeClause) {
+            $filter = "WHERE $categoryClause $activeClause";
+        }
         $sql = "SELECT SQL_CALC_FOUND_ROWS *, UNIX_TIMESTAMP(publicationDate) 
                 AS publicationDate
-                FROM articles $categoryClause $activeArticlesFilter
+                FROM articles $filter
                 ORDER BY  $order  LIMIT :numRows";
         
         $st = $conn->prepare($sql);
