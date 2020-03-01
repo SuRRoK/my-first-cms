@@ -24,9 +24,19 @@
 
 Удачной разработки!
 
-
+```mysql
 ALTER TABLE `articles` 
     ADD `is_active` 
         TINYINT(1) NOT NULL DEFAULT 1 
             AFTER `content`
                 -- Поле для контроля статуса отображения статьи
+```
+
+Создание таблицы для хранения данных о пользователях                
+```mysql
+CREATE TABLE `users` ( 
+    `id` SMALLINT(5) NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+    `username` VARCHAR(255) NOT NULL UNIQUE, 
+    `password` VARCHAR(255) NOT NULL , 
+    `is_active` TINYINT(1) NOT NULL DEFAULT '0' )
+```                

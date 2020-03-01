@@ -38,6 +38,9 @@ switch ($action) {
     case 'deleteCategory':
         deleteCategory();
         break;
+    case 'editUser':
+        editUser();
+        break;
     default:
         listArticles();
 }
@@ -301,6 +304,39 @@ function deleteCategory() {
 
     $category->delete();
     header( "Location: admin.php?action=listCategories&status=categoryDeleted" );
+}
+
+function editUser()
+{
+    $results = array();
+    $results['pageTitle'] = 'Edit User';
+    $results['formAction'] = 'editUser';
+
+   /* if (isset($_POST['saveChanges'])) {
+
+        // Пользователь получил форму редактирования статьи: сохраняем изменения
+        if (!$article = Article::getById((int)$_POST['articleId'])) {
+            header("Location: admin.php?error=articleNotFound");
+            return;
+        }
+
+        $article->storeFormValues($_POST);
+        $article->update();
+        header("Location: admin.php?status=changesSaved");
+
+    } elseif (isset($_POST['cancel'])) {
+
+        // Пользователь отказался от результатов редактирования: возвращаемся к списку статей
+        header("Location: admin.php");
+    } else {*/
+
+        // Пользвоатель еще не получил форму редактирования: выводим форму
+        $results['article'] = User::getUserBy('id', 1);
+/*        $data = Category::getList();
+        $results['categories'] = $data['results'];
+        require(TEMPLATE_PATH . "/admin/editArticle.php");*/
+//    }
+
 }
 
         
