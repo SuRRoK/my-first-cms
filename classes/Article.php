@@ -41,6 +41,12 @@ class Article
      */
     public $shortContent = null;
     /**
+     * @var int Статус статьи (
+     * is_active = 1 Отображается
+     * is_active = 0 Скрыта
+     */
+    public $isActive = null;
+    /**
     * Устанавливаем свойства с помощью значений в заданном массиве
     *
     * @param assoc Значения свойств
@@ -85,6 +91,10 @@ class Article
       if (isset($data['summary'])) {
           $this->summary = $data['summary'];         
       }
+
+      if (isset($data['is_active'])) {
+          $this->isActive = $data['is_active'];
+      }
       
       if (isset($data['content'])) {
           $this->content = $data['content'];
@@ -102,6 +112,9 @@ class Article
 
       // Сохраняем все параметры
       $this->__construct( $params );
+
+      //Обрабатываем галочку статуса статьи
+      $this->isActive = isset($params['isActive']);
 
       // Разбираем и сохраняем дату публикации
       if ( isset($params['publicationDate']) ) {
@@ -227,13 +240,12 @@ class Article
       if ( is_null( $this->id ) ) trigger_error ( "Article::update(): "
               . "Attempt to update an Article object "
               . "that does not have its ID property set.", E_USER_ERROR );
-
+        print_r($this);
       // Обновляем статью
       $conn = new PDO( DB_DSN, DB_USERNAME, DB_PASSWORD );
       $sql = "UPDATE articles SET publicationDate=FROM_UNIXTIME(:publicationDate),"
               . " categoryId=:categoryId, title=:title, summary=:summary,"
-              . " content=:content WHERE id = :id";
-      
+              . " content=:content, is_active=:isActive WHERE id = :id";
       $st = $conn->prepare ( $sql );
       $st->bindValue( ":publicationDate", $this->publicationDate, PDO::PARAM_INT );
       $st->bindValue( ":categoryId", $this->categoryId, PDO::PARAM_INT );
@@ -241,6 +253,7 @@ class Article
       $st->bindValue( ":summary", $this->summary, PDO::PARAM_STR );
       $st->bindValue( ":content", $this->content, PDO::PARAM_STR );
       $st->bindValue( ":id", $this->id, PDO::PARAM_INT );
+      $st->bindValue( ":isActive", $this->isActive, PDO::PARAM_INT );
       $st->execute();
       $conn = null;
     }
