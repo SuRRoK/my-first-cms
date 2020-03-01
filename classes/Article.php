@@ -159,14 +159,16 @@ class Article
     * @param string $order Столбец, по которому выполняется сортировка статей (по умолчанию = "publicationDate DESC")
     * @return Array|false Двух элементный массив: results => массив объектов Article; totalRows => общее количество строк
     */
-    public static function getList($numRows=1000000, 
-            $categoryId=null, $order="publicationDate DESC") 
+    public static function getList($numRows=1000000,
+            $categoryId=null, $order="publicationDate DESC")
     {
         $conn = new PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);
-        $categoryClause = $categoryId ? "WHERE categoryId = :categoryId" : "";
+        $categoryClause = $categoryId ? " WHERE categoryId = :categoryId" : "";
+        $trace = debug_backtrace();
+        $activeArticlesFilter = stripos($trace[1]['file'], 'admin') ? "" : " WHERE is_active = 1";
         $sql = "SELECT SQL_CALC_FOUND_ROWS *, UNIX_TIMESTAMP(publicationDate) 
                 AS publicationDate
-                FROM articles $categoryClause
+                FROM articles $categoryClause $activeArticlesFilter
                 ORDER BY  $order  LIMIT :numRows";
         
         $st = $conn->prepare($sql);
