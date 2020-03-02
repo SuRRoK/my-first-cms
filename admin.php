@@ -10,7 +10,7 @@ if ($action != "login" && $action != "logout" && !$username) {
     exit;
 }
 
-switch ($action) {
+/*switch ($action) {
     case 'login':
         login();
         break;
@@ -43,7 +43,27 @@ switch ($action) {
         break;
     default:
         listArticles();
-}
+}*/
+
+$adminRoutes = [
+    'default' => 'listArticles',
+    'login' => 'login',
+    'logout' => 'logout',
+    // Маршруты статьи
+    'newArticle' => 'newArticle',
+    'editArticle' => 'editArticle',
+    'deleteArticle' => 'deleteArticle',
+    // Маршруты категории
+    'listCategories' => 'listCategories',
+    'newCategory' => 'newCategory',
+    'editCategory' => 'editCategory',
+    'deleteCategory' => 'deleteCategory',
+    // Маршруты пользователя
+    'editUser' => 'editUser',
+];
+
+isset($adminRoutes[$action]) ? $adminRoutes[$action]() : $adminRoutes['default']();
+
 
 /**
  * Авторизация пользователя (админа) -- установка значения в сессию

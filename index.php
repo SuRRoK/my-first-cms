@@ -16,7 +16,7 @@ function initApplication()
 {
     $action = isset($_GET['action']) ? $_GET['action'] : "";
 
-    switch ($action) {
+/*    switch ($action) {
         case 'archive':
           archive();
           break;
@@ -25,7 +25,16 @@ function initApplication()
           break;
         default:
           homepage();
-    }
+    }*/
+
+    $indexRoutes = [
+        'default' => 'homepage',
+        'archive' => 'archive',
+        'viewArticle' => 'viewArticle',
+    ];
+
+    isset($indexRoutes[$action]) ? $indexRoutes[$action]() : $indexRoutes['default']();
+
 }
 
 function archive() 
