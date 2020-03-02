@@ -6,9 +6,13 @@ echo "<pre>"; */?> Данные о массиве $results и типе форм�
 
 <h1><?= $results['pageTitle'] ?></h1>
 
-<form action="admin.php?action=<?= $results['formAction'] ?>" method="post">
+<form action="admin.php?action=<?= $results['formAction'] ?>&id=<?= $results['user']->id ?>" method="post">
     <input type="hidden" name="userId" value="<?= $results['user']->id ?>">
     <input type="hidden" name="formAction" value="<?= $results['formAction'] ?>">
+
+    <?php if (isset($results['user']->username)) { ?>
+    <input type="hidden" name="prevUsername" value="<?= $results['user']->username ?>">
+    <?php } ?>
 
     <?php if (isset($results['errorMessage'])) { ?>
         <div class="errorMessage"><?= $results['errorMessage'] ?></div>
@@ -34,7 +38,7 @@ echo "<pre>"; */?> Данные о массиве $results и типе форм�
         </li>
         <?php if ($_SESSION['username'] === 'admin') { ?>
         <li>
-            <label for="isActive">User status</label>
+            <label for="isActive">Activated?</label>
             <input type="checkbox" name="isActive"
                    id="isActive" <?php $results['user']->isActive ? print 'checked' : null ?> />
         </li>

@@ -341,6 +341,7 @@ function listUsers() {
 
     if ( isset( $_GET['error'] ) ) {
         if ( $_GET['error'] == "userNotFound" ) $results['errorMessage'] = "Error: User not found.";
+        if ( stripos($_GET['error'], "Error:" ) !== false) $results['errorMessage'] = $_GET['error'];
     }
 
     if ( isset( $_GET['status'] ) ) {
@@ -361,24 +362,41 @@ function editUser()
     if (isset($_POST['saveChanges'])) {
 
         // Пользователь получил форму редактирования
-        if (!$user= User::getUserBy('id', (int)$_POST['userId'])) {
+        if (!$user = User::getUserBy('id', (int)$_POST['userId'])) {
             header("Location: admin.php?action=listUsers&error=userNotFound");
             return;
         }
-
-        $user->storeFormValues($_POST);
-        $user->update();
-        header("Location: admin.php?action=listUsers&status=changesSaved");
+        $_POST = array_map('trim', $_POST);
+        $checkResult = User::checkForm($_POST);
+        if (!$checkResult) {
+            $user->storeFormValues($_POST);
+            $user->update();
+            header("Location: admin.php?action=listUsers&status=changesSaved");
+        } else {
+            $results['errorMessage'] = $checkResult;
+//            $results['user'] = $user;
+//            echo '<pre>';
+//            print_r($user);
+//            die();
+//            require( TEMPLATE_PATH . "/admin/editUser.php" );
+            header("Location: admin.php?action=listUsers&error=$checkResult");
+        }
 
     } elseif (isset($_POST['cancel'])) {
 
-        // Пользователь отказался от результатов редактирования: возвращаемся к списку статей
-        header("Location: admin.php");
+        // Пользователь отказался от результатов редактирования: возвращаемся к списку пользователей
+        header("Location: admin.php?action=listUsers");
     } else {
 
         // Пользвоатель еще не получил форму редактирования: выводим форму
-        $results['user'] = User::getUserBy('id', (int)$_GET['userId']);
-        require(TEMPLATE_PATH . "/admin/editUser.php");
+        $user = User::getUserBy('id', (int)$_GET['userId']);
+        if ($user) {
+            $results['user'] = $user;
+            require(TEMPLATE_PATH . "/admin/editUser.php");
+        } else {
+            $results['errorMessage'] = "Error: User not found.";
+            header("Location: admin.php?action=listUsers&error=userNotFound");
+        }
     }
 
 }
@@ -402,7 +420,7 @@ function newUser() {
         } else {
             $results['errorMessage'] = $checkResult;
             $results['user'] = new User($_POST);
-            require( TEMPLATE_PATH . "/admin/editUser.php" );
+            require( TEMPLATE_PATH . "/admin/listUsers.php" );
         }
 
     } elseif ( isset( $_POST['cancel'] ) ) {
