@@ -73,28 +73,35 @@ isset($adminRoutes[$action]) ? $adminRoutes[$action]() : $adminRoutes['default']
  */
 function login() {
 
-    $results = array();
+    $results = [];
     $results['pageTitle'] = "Admin Login | Widget News";
 
     if (isset($_POST['login'])) {
 
         // Пользователь получает форму входа: попытка авторизировать пользователя
+        $_POST['username'] = mb_strtolower(trim($_POST['username']));
 
         if ($_POST['username'] === ADMIN_USERNAME) {
                 if ($_POST['password'] === ADMIN_PASSWORD) {
-
                 // Вход прошел успешно: создаем сессию и перенаправляем на страницу администратора
                 $_SESSION['username'] = ADMIN_USERNAME;
                 header("Location: admin.php");
-            } else if (User::checkLogin()) {
-                header("Location: /");
             }
 
-        } else {
+        } elseif (!User::checkLoginError($_POST)) {
+            $_SESSION['username'] = $_POST['username'];
 
-          // Ошибка входа: выводим сообщение об ошибке для пользователя
-          $results['errorMessage'] = "Неправильный пароль, попробуйте ещё раз.";
-          require( TEMPLATE_PATH . "/admin/loginForm.php" );
+            header("Location: /");
+
+        }else {
+            // Ошибка входа: выводим сообщение об ошибке для пользователя
+            $error = User::checkLoginError($_POST);
+            if ($error) {
+                $results['errorMessage'] = $error;
+            } else {
+                $results['errorMessage'] = "Неправильный пароль, попробуйте ещё раз.";
+            }
+            require( TEMPLATE_PATH . "/admin/loginForm.php" );
         }
 
     } else {
@@ -374,12 +381,12 @@ function editUser()
             header("Location: admin.php?action=listUsers&status=changesSaved");
         } else {
             $results['errorMessage'] = $checkResult;
-//            $results['user'] = $user;
+            $results['user'] = $user;
 //            echo '<pre>';
 //            print_r($user);
 //            die();
-//            require( TEMPLATE_PATH . "/admin/editUser.php" );
-            header("Location: admin.php?action=listUsers&error=$checkResult");
+            require( TEMPLATE_PATH . "/admin/editUser.php" );
+//            header("Location: admin.php?action=listUsers&error=$checkResult");
         }
 
     } elseif (isset($_POST['cancel'])) {
@@ -420,7 +427,7 @@ function newUser() {
         } else {
             $results['errorMessage'] = $checkResult;
             $results['user'] = new User($_POST);
-            require( TEMPLATE_PATH . "/admin/listUsers.php" );
+            require( TEMPLATE_PATH . "/admin/editUser.php" );
         }
 
     } elseif ( isset( $_POST['cancel'] ) ) {

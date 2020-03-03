@@ -1,5 +1,15 @@
 
 <?php include "templates/include/header.php" ?>
+
+<?php if ( isset( $results['errorMessage'] ) ) { ?>
+    <div class="errorMessage"><?php echo $results['errorMessage'] ?></div>
+<?php } ?>
+
+
+<?php if ( isset( $results['statusMessage'] ) ) { ?>
+    <div class="statusMessage"><?php echo $results['statusMessage'] ?></div>
+<?php } ?>
+
     <ul id="headlines">
     <?php foreach ($results['articles'] as $article) { ?>
         <li class='<?php echo $article->id?>'>

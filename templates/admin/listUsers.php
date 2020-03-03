@@ -18,7 +18,7 @@
               <th>Status</th>
             </tr>
            
-    <?php foreach ( $results['users'] as $user ) { ?>
+    <?php foreach ( $results['users'] as $user ) {?>
 
             <tr onclick="location='admin.php?action=editUser&amp;userId=<?= $user->id?>'">
               <td>

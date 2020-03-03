@@ -6,7 +6,16 @@ echo "<pre>"; */?> Данные о массиве $results и типе форм�
 
 <h1><?= $results['pageTitle'] ?></h1>
 
-<form action="admin.php?action=<?= $results['formAction'] ?>&id=<?= $results['user']->id ?>" method="post">
+<?php if ($results['formAction'] === 'editUser') { ?>
+    <h3>Editing user <?= $results['user']->username ?> </h3>
+<?php } ?>
+
+<form   <?php if ($results['formAction'] === 'register') { ?>
+        action="/?action=<?= $results['formAction'] ?>"
+        <?php } else { ?>
+        action="admin.php?action=<?= $results['formAction'] ?>"
+        <?php } ?>
+        method="post">
     <input type="hidden" name="userId" value="<?= $results['user']->id ?>">
     <input type="hidden" name="formAction" value="<?= $results['formAction'] ?>">
 
@@ -26,17 +35,17 @@ echo "<pre>"; */?> Данные о массиве $results и типе форм�
         </li>
 
         <li>
-            <label for="password">New password</label>
+            <label for="password">Password</label>
             <input type="password" name="password" id="password" placeholder="Enter new password" autofocus
                    maxlength="255"/>
         </li>
 
         <li>
-            <label for="password">Confirm new password</label>
+            <label for="password">Confirm password</label>
             <input type="password" name="password_cf" id="password_cf" placeholder="Confirm new passwordd" autofocus
                    maxlength="255"/>
         </li>
-        <?php if ($_SESSION['username'] === 'admin') { ?>
+        <?php if (isset($_SESSION['username']) && $_SESSION['username'] === 'admin') { ?>
         <li>
             <label for="isActive">Activated?</label>
             <input type="checkbox" name="isActive"

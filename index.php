@@ -3,6 +3,9 @@
 //phpinfo(); die();
 
 require("config.php");
+session_start();
+$action = isset($_GET['action']) ? $_GET['action'] : "";
+$username = isset($_SESSION['username']) ? $_SESSION['username'] : "";
 
 try {
     initApplication();
@@ -31,6 +34,7 @@ function initApplication()
         'default' => 'homepage',
         'archive' => 'archive',
         'viewArticle' => 'viewArticle',
+        'register' => 'register',
     ];
 
     isset($indexRoutes[$action]) ? $indexRoutes[$action]() : $indexRoutes['default']();
@@ -94,7 +98,21 @@ function viewArticle()
  */
 function homepage() 
 {
-    $results = array();
+    $results = [];
+    if (isset($_GET['error'])) { // вывод сообщения об ошибке (если есть)
+        if ($_GET['error'] == "articleNotFound")
+            $results['errorMessage'] = "Error: Article not found.";
+    }
+
+    if (isset($_GET['status'])) { // вывод сообщения (если есть)
+        if ($_GET['status'] == "changesSaved") {
+            $results['statusMessage'] = "Your changes have been saved.";
+        }
+        if ($_GET['status'] == "registerSuccess") {
+            $results['statusMessage'] = "You successfully registered.";
+        }
+    }
+
     $data = Article::getList(HOMEPAGE_NUM_ARTICLES, null, false);
     $results['articles'] = $data['results'];
     $results['totalRows'] = $data['totalRows'];
@@ -115,3 +133,43 @@ function homepage()
     require(TEMPLATE_PATH . "/homepage.php");
     
 }
+
+function register()
+{
+
+    $results = [];
+    $results['pageTitle'] = "Registration";
+    $results['formAction'] = "register";
+
+    if ( isset( $_POST['saveChanges'] ) ) {
+        // User has posted the category edit form: save the new category4
+
+        $_POST = array_map('trim', $_POST);
+        $checkResult = User::checkForm($_POST);
+//        print_r($checkResult); die;
+        if (!$checkResult) {
+            $user = new User;
+            $user->storeFormValues($_POST);
+            $user->insert();
+            header("Location: /?status=registerSuccess");
+        } else {
+            $results['errorMessage'] = $checkResult;
+            $results['user'] = new User($_POST);
+            require( TEMPLATE_PATH . "/admin/editUser.php" );
+        }
+
+    } elseif ( isset( $_POST['cancel'] ) ) {
+
+        // User has cancelled their edits: return to the user list
+        header( "Location: /" );
+    } elseif (!isset($_SESSION['username']) || $_SESSION['username'] === '') {
+
+        // User has not posted the category edit form yet: display the form
+        $results['user'] = new User;
+        require( TEMPLATE_PATH . "/admin/editUser.php" );
+    } else {
+
+        header( "Location: /" );
+    }
+}
+

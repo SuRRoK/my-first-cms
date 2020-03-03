@@ -65,10 +65,15 @@ class User
 
         // Сохраняем все параметры
         $this->__construct($params);
-
+//echo '<pre>'; print_r($params); die;
         // Обрабатываем галочку статуса пользователя
-        $this->isActive = isset($params['isActive']);
+        if ($params['formAction'] !== 'register') {
+            $this->isActive = isset($params['isActive']);
+        } else {
+            $this->isActive = 0;
+        }
 
+        $this->username = mb_strtolower($params['username']);
         // Хэшируем пароль
         if (isset($params['password']) && $params['password'] !== '') {
             $this->password = password_hash($params['password'], PASSWORD_BCRYPT);
@@ -173,8 +178,15 @@ class User
     {
         $passLength = 3;
         $usernameLength = 3;
-        if ($fields['formAction'] === 'newUser' || $fields['username'] !== $fields['prevUsername']) {
-            $alreadyExists = self::getUserBy('username', $fields['username']);
+        $allowedFormAction = ['newUser', 'register', 'editUser'];
+
+        if (!in_array($fields['formAction'], $allowedFormAction, true)) {
+            return 'Error: Unallowed action';
+        }
+
+        $isNewUser = $fields['formAction'] === 'newUser' || $fields['formAction'] === 'register';
+        if ($isNewUser || $fields['username'] !== $fields['prevUsername']) {
+            $alreadyExists = self::getUserBy('username', mb_strtolower($fields['username']));
 
             if ($alreadyExists) {
                 return 'Error: User already exists';
@@ -185,7 +197,7 @@ class User
             return 'Error: Username too short';
         }
 
-        if ($fields['formAction'] === 'newUser' || $fields['password'] !== '') {
+        if ($isNewUser || $fields['password'] !== '') {
             if (mb_strlen($fields['password']) < $passLength) {
                 return 'Error: Password too short';
             }
@@ -232,6 +244,19 @@ class User
         $st->bindValue( ":id", $this->id, PDO::PARAM_INT );
         $st->execute();
         $conn = null;
+    }
+
+    public static function checkLoginError($fields) {
+        $user = self::getUserBy('username', $fields['username']);
+        if ($user && password_verify($fields['password'],$user->password)) {
+            if ($user->isActive) {
+                return false;
+            }
+            return 'Error: Your account is not active. Please contact administrator';
+
+        }
+
+        return 'Error: Incorrect data';
     }
 
 }
