@@ -40,3 +40,18 @@ CREATE TABLE `users` (
     `password` VARCHAR(255) NOT NULL , 
     `is_active` TINYINT(1) NOT NULL DEFAULT '0' )
 ```                
+Создание таблицы для хранения субкатегорий
+```mysql
+CREATE TABLE `subcategories` ( 
+    `id` SMALLINT(5) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+    `name` VARCHAR(255) NOT NULL, 
+    `description` TEXT(1500) NOT NULL , 
+    `category` SMALLINT(5) UNSIGNED NOT NULL ,
+    FOREIGN KEY (`category`) REFERENCES `categories` (id))
+```
+
+```mysql
+ALTER TABLE `articles` 
+ADD `subcategoryID` SMALLINT(5) UNSIGNED AFTER `categoryId`,
+ADD FOREIGN KEY (`subcategoryID`) REFERENCES `subcategories`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+```
