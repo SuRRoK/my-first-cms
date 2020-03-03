@@ -131,7 +131,7 @@ class User
             trigger_error("User::insert(): Attempt to insert a User object that already has its id property set (to $this->id).", E_USER_ERROR);
         }
 
-        // Вставляем статью
+        // Запрос в базу
         $conn = new PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);
         $sql = "INSERT INTO users ( username, password, is_active) VALUES ( :username, :password, :isActive )";
         $st = $conn->prepare($sql);
@@ -145,7 +145,7 @@ class User
     }
 
     /**
-     * Возвращает все (или диапазон) объекты Users из базы данных
+     * Возвращает все объекты Users из базы данных
      *
      * @return Array|false Двух элементный массив: results => массив объектов Users; totalRows => общее количество строк
      */
@@ -163,7 +163,7 @@ class User
             $list[] = new User($row);
         }
 
-        // Получаем общее количество статей, которые соответствуют критерию
+        // Получаем общее количество записей, которые соответствуют критерию
         $sql = "SELECT FOUND_ROWS() AS totalRows";
         $totalRows = $conn->query($sql)->fetch();
         $conn = null;
@@ -209,13 +209,13 @@ class User
     }
 
     /**
-     * Обновляем текущий объект статьи в базе данных
+     * Обновляем выбранного пользователя в базе данных
      */
     public function update()
     {
 
         // Есть ли у объекта ID?
-        if (is_null($this->id)) trigger_error("User::update(): "
+        if ($this->id === null) trigger_error("User::update(): "
             . "Attempt to update an User object "
             . "that does not have its ID property set.", E_USER_ERROR);
 
@@ -237,7 +237,7 @@ class User
     public function delete() {
 
         // Есть ли у объекта ID?
-        if ( is_null( $this->id ) ) trigger_error ( "User::delete(): Attempt to delete a User object that does not have its ID property set.", E_USER_ERROR );
+        if ($this->id === null) trigger_error ( 'User::delete(): Attempt to delete a User object that does not have its ID property set.', E_USER_ERROR );
 
         $conn = new PDO( DB_DSN, DB_USERNAME, DB_PASSWORD );
         $st = $conn->prepare ( "DELETE FROM users WHERE id = :id LIMIT 1" );
