@@ -46,7 +46,7 @@ CREATE TABLE `subcategories` (
     `id` SMALLINT(5) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, 
     `name` VARCHAR(255) NOT NULL, 
     `description` TEXT(1500) NOT NULL , 
-    `category` SMALLINT(5) UNSIGNED NOT NULL ,
+    `categoryId` SMALLINT(5) UNSIGNED NOT NULL ,
     FOREIGN KEY (`category`) REFERENCES `categories` (id))
 ```
 

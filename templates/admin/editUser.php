@@ -36,13 +36,13 @@ echo "<pre>"; */?> Данные о массиве $results и типе форм�
 
         <li>
             <label for="password">Password</label>
-            <input type="password" name="password" id="password" placeholder="Enter new password" autofocus
+            <input type="password" name="password" id="password" placeholder="Enter password" autofocus
                    maxlength="255"/>
         </li>
 
         <li>
             <label for="password">Confirm password</label>
-            <input type="password" name="password_cf" id="password_cf" placeholder="Confirm new passwordd" autofocus
+            <input type="password" name="password_cf" id="password_cf" placeholder="Confirm password" autofocus
                    maxlength="255"/>
         </li>
         <?php if (isset($_SESSION['username']) && $_SESSION['username'] === 'admin') { ?>
