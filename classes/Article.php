@@ -155,16 +155,20 @@ class Article
     * Возвращает все (или диапазон) объекты Article из базы данных
     *
     * @param int $numRows Количество возвращаемых строк (по умолчанию = 1000000)
-    * @param int $categoryId Вернуть статьи только из категории с указанным ID
+    * @param Array $categoryId Вернуть статьи только из категории или подкатегории с указанным ID
     * @param bool $allArticles Возврат всех, либо только активных статей
     * @param string $order Столбец, по которому выполняется сортировка статей (по умолчанию = "publicationDate DESC")
     * @return Array|false Двух элементный массив: results => массив объектов Article; totalRows => общее количество строк
     */
     public static function getList($numRows=1000000,
-            $categoryId=null, $allArticles = true, $order="publicationDate DESC")
+            $categoryId = [], $allArticles = true, $order="publicationDate DESC")
     {
         $conn = new PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);
-        $categoryClause = $categoryId ? "categoryId = :categoryId" : "";
+
+        $categoryType = $categoryId['type'] ?? false;
+        $categoryValue = $categoryId['value'] ?? '';
+
+        $categoryClause = $categoryType ? "$categoryType = :$categoryType" : "";
         $activeClause = !$allArticles ? "is_active = 1" : "";
         $filter = '';
         if ($categoryClause && $activeClause) {
@@ -184,8 +188,8 @@ class Article
 //                        Здесь $st - текст предполагаемого SQL-запроса, причём переменные не отображаются
         $st->bindValue(":numRows", $numRows, PDO::PARAM_INT);
         
-        if ($categoryId) 
-            $st->bindValue( ":categoryId", $categoryId, PDO::PARAM_INT);
+        if ($categoryType)
+            $st->bindValue( ":$categoryType", $categoryValue, PDO::PARAM_INT);
         
         $st->execute(); // выполняем запрос к базе данных
 //                        echo "<pre>";

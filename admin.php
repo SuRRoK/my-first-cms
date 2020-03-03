@@ -63,10 +63,14 @@ $adminRoutes = [
     'newUser' => 'newUser',
     'editUser' => 'editUser',
     'deleteUser' => 'deleteUser',
+    // Маршруты подкатегорий
+    'listSubcategories' => 'listSubcategories',
+    'newSubcategory' => 'newSubcategory',
+    'editSubcategory' => 'editSubcategory',
+    'deleteSubcategory' => 'deleteSubcategory',
 ];
 
 isset($adminRoutes[$action]) ? $adminRoutes[$action]() : $adminRoutes['default']();
-
 
 /**
  * Авторизация пользователя (админа) -- установка значения в сессию
@@ -112,12 +116,10 @@ function login() {
 
 }
 
-
 function logout() {
     unset( $_SESSION['username'] );
     header( "Location: admin.php" );
 }
-
 
 function newArticle() {
 	  
@@ -154,7 +156,6 @@ function newArticle() {
         require( TEMPLATE_PATH . "/admin/editArticle.php" );
     }
 }
-
 
 /**
  * Редактирование статьи
@@ -194,7 +195,6 @@ function editArticle() {
 
 }
 
-
 function deleteArticle() {
 
     if ( !$article = Article::getById( (int)$_GET['articleId'] ) ) {
@@ -205,7 +205,6 @@ function deleteArticle() {
     $article->delete();
     header( "Location: admin.php?status=articleDeleted" );
 }
-
 
 function listArticles() {
     $results = array();
@@ -258,8 +257,7 @@ function listCategories() {
 
     require( TEMPLATE_PATH . "/admin/listCategories.php" );
 }
-	  
-	  
+
 function newCategory() {
 
     $results = array();
@@ -286,7 +284,6 @@ function newCategory() {
     }
 
 }
-
 
 function editCategory() {
 
@@ -320,7 +317,6 @@ function editCategory() {
 
 }
 
-
 function deleteCategory() {
 
     if ( !$category = Category::getById( (int)$_GET['categoryId'] ) ) {
@@ -328,7 +324,7 @@ function deleteCategory() {
         return;
     }
 
-    $articles = Article::getList( 1000000, $category->id );
+    $articles = Article::getList( 1000000, ['type' => 'categoryId', 'value' => $category->id] );
 
     if ( $articles['totalRows'] > 0 ) {
         header( "Location: admin.php?action=listCategories&error=categoryContainsArticles" );
@@ -358,7 +354,6 @@ function listUsers() {
 
     require( TEMPLATE_PATH . "/admin/listUsers.php" );
 }
-
 
 function editUser()
 {
@@ -443,7 +438,6 @@ function newUser() {
 
 }
 
-
 function deleteUser() {
 
     if ( !$user = User::getUserBy('id', (int)$_GET['userId'] ) ) {
@@ -455,4 +449,104 @@ function deleteUser() {
     header( "Location: admin.php?action=listUsers&status=userDeleted" );
 }
 
-        
+function listSubcategories() {
+    $results = [];
+//    $data = Category::getList();
+//    $results['categories'] = $data['results'];
+    $data = Subcategory::getList();
+    $results['subcategories'] = $data['results'];
+    $results['totalRows'] = $data['totalRows'];
+    $results['pageTitle'] = "Article Subcategories";
+
+    if ( isset( $_GET['error'] ) ) {
+        if ( $_GET['error'] == "subcategoryNotFound" ) $results['errorMessage'] = "Error: Subcategory not found.";
+        if ( $_GET['error'] == "subcategoryContainsArticles" ) $results['errorMessage'] = "Error: Subcategory contains articles. Delete the articles, or assign them to another category, before deleting this Subcategory.";
+    }
+
+    if ( isset( $_GET['status'] ) ) {
+        if ( $_GET['status'] == "changesSaved" ) $results['statusMessage'] = "Your changes have been saved.";
+        if ( $_GET['status'] == "subcategoryDeleted" ) $results['statusMessage'] = "Subcategory deleted.";
+    }
+
+    require( TEMPLATE_PATH . "/admin/listSubcategories.php" );
+}
+
+function newSubcategory() {
+
+    $results = [];
+    $results['pageTitle'] = "New Article Subcategory";
+    $results['formAction'] = "newSubcategory";
+
+    if ( isset( $_POST['saveChanges'] ) ) {
+
+        // User has posted the subcategory edit form: save the new category
+        $subcategory = new Subcategory;
+//        echo '<pre>'; print_r($_POST); die();
+        $subcategory->storeFormValues( $_POST );
+        $subcategory->insert();
+        header( "Location: admin.php?action=listSubcategories&status=changesSaved" );
+
+    } elseif ( isset( $_POST['cancel'] ) ) {
+
+        // User has cancelled their edits: return to the subcategory list
+        header( "Location: admin.php?action=listSubcategories" );
+    } else {
+
+        // User has not posted the subcategory edit form yet: display the form
+        $results['subcategory'] = new Subcategory;
+        $results['categories'] = Category::getList();
+        require( TEMPLATE_PATH . "/admin/editSubcategory.php" );
+    }
+
+}
+
+function editSubcategory() {
+
+    $results = [];
+    $results['pageTitle'] = "Edit Article Subcategory";
+    $results['formAction'] = "editSubcategory";
+
+    if ( isset( $_POST['saveChanges'] ) ) {
+
+        // User has posted the category edit form: save the subcategory changes
+//        echo '<pre>'; print_r($_POST); die();
+        if ( !$subcategory = Subcategory::getById( (int)$_POST['subcategoryId'] ) ) {
+            header( "Location: admin.php?action=listSubcategories&error=categoryNotFound" );
+            return;
+        }
+
+        $subcategory->storeFormValues( $_POST );
+        $subcategory->update();
+        header( "Location: admin.php?action=listSubcategories&status=changesSaved" );
+
+    } elseif ( isset( $_POST['cancel'] ) ) {
+
+        // User has cancelled their edits: return to the category list
+        header( "Location: admin.php?action=listSubcategories" );
+    } else {
+
+        // User has not posted the category edit form yet: display the form
+        $results['subcategory'] = Subcategory::getById( (int)$_GET['categoryId'] );
+        $results['categories'] = Category::getList();
+        require( TEMPLATE_PATH . "/admin/editSubcategory.php" );
+    }
+
+}
+
+function deleteSubcategory() {
+
+    if ( !$subcategory = Subcategory::getById( (int)$_GET['subcategoryId'] ) ) {
+        header( "Location: admin.php?action=listSubcategories&error=subcategoryNotFound" );
+        return;
+    }
+
+    $articles = Article::getList( 1000000, ['type' => 'subcategoryId', 'value' => $subcategory->id] );
+
+    if ( $articles['totalRows'] > 0 ) {
+        header( "Location: admin.php?action=listSubcategories&error=subcategoryContainsArticles" );
+        return;
+    }
+
+    $subcategory->delete();
+    header( "Location: admin.php?action=listSubcategories&status=subcategoryDeleted" );
+}

@@ -4,7 +4,7 @@
  * Класс для обработки категорий статей
  */
 
-class SubCategory
+class Subcategory
 {
     // Свойства
 
@@ -29,6 +29,11 @@ class SubCategory
     public $categoryId = null;
 
     /**
+     * @var string Название категории
+     */
+    public $categoryName = null;
+
+    /**
     * Устанавливаем свойства объекта с использованием значений в передаваемом массиве
     *
     * @param assoc Значения свойств
@@ -38,7 +43,8 @@ class SubCategory
         if ( isset( $data['id'] ) ) $this->id = (int) $data['id'];
         if ( isset( $data['name'] ) ) $this->name = $data['name'];
         if ( isset( $data['description'] ) ) $this->description = $data['description'];
-        if ( isset( $data['categoryId'] ) ) $this->id = (int) $data['id'];
+        if ( isset( $data['categoryId'] ) ) $this->categoryId = (int) $data['categoryId'];
+        if ( isset( $data['categoryName'] ) ) $this->categoryName = $data['categoryName'];
     }
 
     /**
@@ -86,7 +92,7 @@ class SubCategory
 
       // Вставляем в базу
       $conn = new PDO( DB_DSN, DB_USERNAME, DB_PASSWORD );
-      $sql = "INSERT INTO categories ( name, description, categoryId ) VALUES ( :name, :description, :categoryId )";
+      $sql = "INSERT INTO subcategories ( name, description, categoryId ) VALUES ( :name, :description, :categoryId )";
       $st = $conn->prepare ( $sql );
       $st->bindValue( ":name", $this->name, PDO::PARAM_STR );
         $st->bindValue( ":description", $this->description, PDO::PARAM_STR );
@@ -108,7 +114,7 @@ class SubCategory
 
       // Обновляем категорию
       $conn = new PDO( DB_DSN, DB_USERNAME, DB_PASSWORD );
-      $sql = "UPDATE categories SET name=:name, description=:description WHERE id = :id";
+      $sql = "UPDATE subcategories SET name=:name, description=:description, categoryId=:categoryId WHERE id = :id";
       $st = $conn->prepare ( $sql );
       $st->bindValue( ":name", $this->name, PDO::PARAM_STR );
       $st->bindValue( ":description", $this->description, PDO::PARAM_STR );
@@ -125,7 +131,7 @@ class SubCategory
      * @param string $categoryId Если предан, то возвращает подкатегории определенной категории
      * @return Array|false Двух элементный массив: results => массив с объектами SubCategory; totalRows => общее количество категорий
      */
-    public static function getList( $numRows=1000000, $categoryId = '' )
+    public static function getList($categoryId = '', $categoryNames = true)
     {
         $conn = new PDO( DB_DSN, DB_USERNAME, DB_PASSWORD);
         if ($categoryId) {
@@ -133,18 +139,21 @@ class SubCategory
         } else {
             $where = '';
         }
-
-        $sql = "SELECT SQL_CALC_FOUND_ROWS * FROM categories $where LIMIT :numRows";
+        if ($categoryNames) {
+            $sql = "SELECT SQL_CALC_FOUND_ROWS subcategories.id,subcategories.name, subcategories.description, 
+        categories.name AS categoryName FROM subcategories LEFT JOIN categories ON subcategories.categoryId = categories.id $where ORDER BY categoryId";
+        } else {
+            $sql = "SELECT SQL_CALC_FOUND_ROWS * FROM subcategories " .
+                "$where ORDER BY categoryId";
+        }
 
         $st = $conn->prepare( $sql );
-        $st->bindValue( ":numRows", $numRows, PDO::PARAM_INT );
         if ($categoryId) {
             $st->bindValue( ":categoryId", $categoryId, PDO::PARAM_INT );
         }
         $st->execute();
         $list = [];
-
-        while ( $row = $st->fetch() ) {
+        while ( $row = $st->fetch(PDO::FETCH_ASSOC) ) {
             $category = new SubCategory( $row );
             $list[] = $category;
         }
@@ -168,7 +177,7 @@ class SubCategory
 
       // Удаляем из базы
       $conn = new PDO( DB_DSN, DB_USERNAME, DB_PASSWORD );
-      $st = $conn->prepare ( "DELETE FROM categories WHERE id = :id LIMIT 1" );
+      $st = $conn->prepare ( "DELETE FROM subcategories WHERE id = :id LIMIT 1" );
       $st->bindValue( ":id", $this->id, PDO::PARAM_INT );
       $st->execute();
       $conn = null;
