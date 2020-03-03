@@ -346,7 +346,7 @@ function listUsers() {
 
     if ( isset( $_GET['status'] ) ) {
         if ( $_GET['status'] == "changesSaved" ) $results['statusMessage'] = "Your changes have been saved.";
-        if ( $_GET['status'] == "categoryDeleted" ) $results['statusMessage'] = "User deleted.";
+        if ( $_GET['status'] == "userDeleted" ) $results['statusMessage'] = "User deleted.";
     }
 
     require( TEMPLATE_PATH . "/admin/listUsers.php" );
@@ -434,6 +434,18 @@ function newUser() {
         require( TEMPLATE_PATH . "/admin/editUser.php" );
     }
 
+}
+
+
+function deleteUser() {
+
+    if ( !$user = User::getUserBy('id', (int)$_GET['userId'] ) ) {
+        header( "Location: admin.php?error=userNotFound" );
+        return;
+    }
+
+    $user->delete();
+    header( "Location: admin.php?action=listUsers&status=userDeleted" );
 }
 
         

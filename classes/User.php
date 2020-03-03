@@ -219,4 +219,19 @@ class User
         $conn = null;
     }
 
+    /**
+     * Удаляем выбранного пользователя
+     */
+    public function delete() {
+
+        // Есть ли у объекта ID?
+        if ( is_null( $this->id ) ) trigger_error ( "User::delete(): Attempt to delete a User object that does not have its ID property set.", E_USER_ERROR );
+
+        $conn = new PDO( DB_DSN, DB_USERNAME, DB_PASSWORD );
+        $st = $conn->prepare ( "DELETE FROM users WHERE id = :id LIMIT 1" );
+        $st->bindValue( ":id", $this->id, PDO::PARAM_INT );
+        $st->execute();
+        $conn = null;
+    }
+
 }
