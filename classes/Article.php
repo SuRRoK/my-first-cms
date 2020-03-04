@@ -53,7 +53,7 @@ class Article
     public $subcategoryId = null;
 
     /**
-     * @var Array Авторы статьи
+     * @var Array ID авторов статьи
      */
     public $authors = null;
 
@@ -167,9 +167,9 @@ class Article
 
         $row = $st->fetch();
 
-/*        $sql = "SELECT user_id, username FROM articles_users" .
-        " JOIN users ON user_id = users.id WHERE article_id = :id";*/
-        $sql = "SELECT user_id FROM articles_users WHERE article_id = :id" ;
+        /*        $sql = "SELECT user_id, username FROM articles_users" .
+                " JOIN users ON user_id = users.id WHERE article_id = :id";*/
+        $sql = "SELECT user_id FROM articles_users WHERE article_id = :id";
         $st = $conn->prepare($sql);
         $st->bindValue(":id", $id, PDO::PARAM_INT);
         $st->execute();
@@ -272,8 +272,25 @@ class Article
         $st->execute();
 
         $this->id = $conn->lastInsertId();
+
+        $this->insertAuthors($conn, $this->id, $this->authors);
+
+/*        $authors = '';
+        foreach ($this->authors as $author) {
+            $authors .= "($this->id,$author),";
+        }
+        $sql = "INSERT INTO articles_users (article_id, user_id) VALUES (:authors)";
+        $st = $conn->prepare($sql);
+        $st->bindValue(":authors", mb_substr($authors, 0, -1), PDO::PARAM_STR);
+
+        d($authors);
+        d($st);
+        dd(mb_substr($authors, 0, -1));
+        $st->execute();*/
         $conn = null;
     }
+
+
 
     /**
      * Обновляем текущий объект статьи в базе данных
@@ -299,6 +316,10 @@ class Article
         $st->bindValue(":id", $this->id, PDO::PARAM_INT);
         $st->bindValue(":isActive", $this->isActive, PDO::PARAM_INT);
         $st->execute();
+
+        $this->deleteAuthors($conn, $this->id);
+        $this->insertAuthors($conn, $this->id, $this->authors);
+
         $conn = null;
     }
 
@@ -316,10 +337,13 @@ class Article
         $st = $conn->prepare("DELETE FROM articles WHERE id = :id LIMIT 1");
         $st->bindValue(":id", $this->id, PDO::PARAM_INT);
         $st->execute();
+
+        $this->deleteAuthors($conn, $this->id);
         $conn = null;
     }
 
-    public static function getSubClasses() {
+    public static function getSubClasses()
+    {
         $data = Category::getList();
         $results['categories'] = $data['results'];
         $data = Subcategory::getList();
@@ -338,7 +362,8 @@ class Article
         return $subcategory->categoryId != $fields['categoryId'] ? 'Error: Subcategory does not belong to selected category' : null;
     }
 
-    public static function getCategoryName($value) {
+    public static function getCategoryName($value)
+    {
         if ($value === '0' || !$value) {
             return ['name' => 'Без категории', 'id' => '0'];
         }
@@ -346,11 +371,31 @@ class Article
         return ['name' => Category::getById($value)->name, 'id' => $value];
     }
 
-    public static function getSubcategoryName($value) {
+    public static function getSubcategoryName($value)
+    {
         if (!$value) {
             return ['name' => 'Без подкатегории', 'id' => 'none'];
         }
 
         return ['name' => Subcategory::getById($value)->name, 'id' => $value];
+    }
+
+    private function insertAuthors($connection, $articleId, $authors)
+    {
+        foreach ($authors as $author) {
+            $sql = "INSERT INTO articles_users (article_id, user_id) VALUES (:articleId, :authorId)";
+            $st = $connection->prepare($sql);
+            $st->bindValue(":authorId", $author, PDO::PARAM_INT);
+            $st->bindValue(":articleId", $articleId, PDO::PARAM_INT);
+            $st->execute();
+        }
+    }
+
+    private function deleteAuthors($connection, $articleId)
+    {
+        $sql = "DELETE FROM articles_users WHERE article_id = :id)";
+        $st = $connection->prepare($sql);
+        $st->bindValue(":articleId", $articleId, PDO::PARAM_INT);
+        $st->execute();
     }
 }

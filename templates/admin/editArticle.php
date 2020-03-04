@@ -76,7 +76,7 @@ $currentCategory = '';
             <select name="authors[]" multiple size="6">
                 <?php foreach ($results['users'] as $user) { ?>
                     <option value="<?= $user->id ?>"<?php
-                    if (in_array($user->id, $results['article']->authors)) {
+                    if ($results['article']->authors && in_array($user->id, $results['article']->authors)) {
                         print ' selected ';
                     }?>><?= htmlspecialchars($user->username) ?></option>
                 <?php } ?>
