@@ -52,6 +52,6 @@ CREATE TABLE `subcategories` (
 
 ```mysql
 ALTER TABLE `articles` 
-ADD `subcategoryID` SMALLINT(5) UNSIGNED AFTER `categoryId`,
-ADD FOREIGN KEY (`subcategoryID`) REFERENCES `subcategories`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ADD `subcategoryId` SMALLINT(5) UNSIGNED AFTER `categoryId`,
+ADD FOREIGN KEY (`subcategoryId`) REFERENCES `subcategories`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 ```

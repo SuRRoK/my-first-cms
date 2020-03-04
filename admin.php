@@ -153,6 +153,8 @@ function newArticle() {
         $results['article'] = new Article;
         $data = Category::getList();
         $results['categories'] = $data['results'];
+        $data = Subcategory::getList();
+        $results['subcategories'] = $data['results'];
         require( TEMPLATE_PATH . "/admin/editArticle.php" );
     }
 }
@@ -175,7 +177,6 @@ function editArticle() {
             header( "Location: admin.php?error=articleNotFound" );
             return;
         }
-
         $article->storeFormValues( $_POST );
         $article->update();
         header( "Location: admin.php?status=changesSaved" );
@@ -190,6 +191,8 @@ function editArticle() {
         $results['article'] = Article::getById((int)$_GET['articleId']);
         $data = Category::getList();
         $results['categories'] = $data['results'];
+        $data = Subcategory::getList();
+        $results['subcategories'] = $data['results'];
         require(TEMPLATE_PATH . "/admin/editArticle.php");
     }
 
@@ -214,11 +217,15 @@ function listArticles() {
     $results['totalRows'] = $data['totalRows'];
     
     $data = Category::getList();
-    $results['categories'] = array();
+    $results['categories'] = [];
     foreach ($data['results'] as $category) { 
         $results['categories'][$category->id] = $category;
     }
-    
+    $data = Subcategory::getList();
+    $results['subcategories'] = [];
+    foreach ($data['results'] as $subcategory) {
+        $results['subcategories'][$subcategory->id] = $subcategory;
+    }
     $results['pageTitle'] = "Все статьи";
 
     if (isset($_GET['error'])) { // вывод сообщения об ошибке (если есть)
@@ -511,7 +518,7 @@ function editSubcategory() {
         // User has posted the category edit form: save the subcategory changes
 //        echo '<pre>'; print_r($_POST); die();
         if ( !$subcategory = Subcategory::getById( (int)$_POST['subcategoryId'] ) ) {
-            header( "Location: admin.php?action=listSubcategories&error=categoryNotFound" );
+            header( "Location: admin.php?action=listSubcategories&error=subcategoryNotFound" );
             return;
         }
 
