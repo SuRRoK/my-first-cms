@@ -3,9 +3,10 @@
 
 <?php
 $currentCategory = '';
-//d($results['article']);
+//d($results['article']->authors);
 //d($results['categories']);
-//dd($results['subcategories']) ?>
+//dd($results['subcategories'])
+//dd($results['users']) ?>
 
 <h1><?php echo $results['pageTitle'] ?></h1>
 
@@ -67,6 +68,18 @@ $currentCategory = '';
                     } else { ?>
                     <option value="<?php echo $subcategory->id ?>"<?php echo ($subcategory->id === $results['article']->subcategoryId) ? " selected" : "" ?>><?php echo htmlspecialchars($subcategory->name) ?></option>
                     <?php } }?>
+            </select>
+        </li>
+
+        <li>
+            <label for="authors">Authors</label>
+            <select name="authors[]" multiple size="6">
+                <?php foreach ($results['users'] as $user) { ?>
+                    <option value="<?= $user->id ?>"<?php
+                    if (in_array($user->id, $results['article']->authors)) {
+                        print ' selected ';
+                    }?>><?= htmlspecialchars($user->username) ?></option>
+                <?php } ?>
             </select>
         </li>
 

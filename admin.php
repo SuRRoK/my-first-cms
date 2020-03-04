@@ -133,6 +133,7 @@ function newArticle() {
         $checkResult = Article::checkForm($_POST);
         if (!$checkResult) {
             $article = new Article;
+//            dd($_POST['authors']);
             $article->storeFormValues($_POST);
             $article->insert();
             header("Location: admin.php?status=changesSaved");
@@ -140,7 +141,7 @@ function newArticle() {
             $results['errorMessage'] = $checkResult;
             $results['article'] = new Article;
             $results['article']->storeFormValues($_POST);
-            $results = array_merge($results, Article::getCategories());
+            $results = array_merge($results, Article::getSubClasses());
             require(TEMPLATE_PATH . "/admin/editArticle.php");
         }
 
@@ -152,7 +153,7 @@ function newArticle() {
 
         // Пользователь еще не получил форму редактирования: выводим форму
         $results['article'] = new Article;
-        $results = array_merge($results, Article::getCategories());
+        $results = array_merge($results, Article::getSubClasses());
         require( TEMPLATE_PATH . "/admin/editArticle.php" );
     }
 }
@@ -183,7 +184,7 @@ function editArticle() {
         } else {
             $results['errorMessage'] = $checkResult;
             $results['article'] = $article;
-            $results = array_merge($results, Article::getCategories());
+            $results = array_merge($results, Article::getSubClasses());
             require(TEMPLATE_PATH . "/admin/editArticle.php");
         }
     } elseif ( isset( $_POST['cancel'] ) ) {
@@ -194,7 +195,7 @@ function editArticle() {
 
         // Пользвоатель еще не получил форму редактирования: выводим форму
         $results['article'] = Article::getById((int)$_GET['articleId']);
-        $results = array_merge($results, Article::getCategories());
+        $results = array_merge($results, Article::getSubClasses());
         require(TEMPLATE_PATH . "/admin/editArticle.php");
     }
 

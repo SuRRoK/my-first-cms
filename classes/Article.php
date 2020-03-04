@@ -53,6 +53,11 @@ class Article
     public $subcategoryId = null;
 
     /**
+     * @var Array Авторы статьи
+     */
+    public $authors = null;
+
+    /**
      * Устанавливаем свойства с помощью значений в заданном массиве
      *
      * @param assoc Значения свойств
@@ -112,6 +117,10 @@ class Article
                 $this->subcategoryId = (int)$data['subcategoryId'];
             }
         }
+
+        if (isset($data['authors'])) {
+            $this->authors = $data['authors'];
+        }
     }
 
 
@@ -157,9 +166,19 @@ class Article
         $st->execute();
 
         $row = $st->fetch();
+
+/*        $sql = "SELECT user_id, username FROM articles_users" .
+        " JOIN users ON user_id = users.id WHERE article_id = :id";*/
+        $sql = "SELECT user_id FROM articles_users WHERE article_id = :id" ;
+        $st = $conn->prepare($sql);
+        $st->bindValue(":id", $id, PDO::PARAM_INT);
+        $st->execute();
+//        $authors = $st->fetchAll(PDO::FETCH_ASSOC);
+        $authors = $st->fetchAll(PDO::FETCH_COLUMN);
         $conn = null;
 
         if ($row) {
+            $row['authors'] = $authors;
             return new Article($row);
         }
     }
@@ -241,7 +260,7 @@ class Article
         // Вставляем статью
         $conn = new PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);
         $sql = "INSERT INTO articles ( publicationDate, categoryId, subcategoryId, title, summary, content, is_active)" .
-            "VALUES ( FROM_UNIXTIME(:publicationDate), :categoryId, :title, :summary, :content, :isActive )";
+            "VALUES ( FROM_UNIXTIME(:publicationDate), :categoryId, :subcategoryId, :title, :summary, :content, :isActive )";
         $st = $conn->prepare($sql);
         $st->bindValue(":publicationDate", $this->publicationDate, PDO::PARAM_INT);
         $st->bindValue(":categoryId", $this->categoryId, PDO::PARAM_INT);
@@ -300,11 +319,13 @@ class Article
         $conn = null;
     }
 
-    public static function getCategories() {
+    public static function getSubClasses() {
         $data = Category::getList();
         $results['categories'] = $data['results'];
         $data = Subcategory::getList();
         $results['subcategories'] = $data['results'];
+        $data = User::getList();
+        $results['users'] = $data['results'];
         return $results;
     }
 

@@ -55,3 +55,17 @@ ALTER TABLE `articles`
 ADD `subcategoryId` SMALLINT(5) UNSIGNED AFTER `categoryId`,
 ADD FOREIGN KEY (`subcategoryId`) REFERENCES `subcategories`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 ```
+Создание таблицы для хранения авторов статьи
+```mysql
+CREATE TABLE `articles_users` (
+    `article_id` SMALLINT(5) UNSIGNED NOT NULL,
+    `user_id` SMALLINT(5) NOT NULL,
+    PRIMARY KEY (`article_id`, `user_id`),
+    INDEX `article_id` (`article_id`),
+    INDEX `user_id` (`user_id`),
+    CONSTRAINT `FK_articles` FOREIGN KEY (`article_id`) 
+        REFERENCES `articles` (`ID`) ON DELETE CASCADE,
+    CONSTRAINT `FK_users` FOREIGN KEY (`user_id`) 
+        REFERENCES `users` (`ID`) ON DELETE CASCADE
+) ENGINE=InnoDB;
+```
