@@ -25,15 +25,12 @@
                     <?php echo htmlspecialchars( $article->title )?>
                 </a>
                 
-                <?php if (isset($article->categoryId)) { ?>
+                <?php if (isset($article->categoryId) && $article->categoryId) { ?>
                     <span class="category">
                         in
                         <a href=".?action=archive&amp;categoryId=<?= $article->categoryId?>">
                             <?= htmlspecialchars($results['categories'][$article->categoryId]->name )?>
                         </a>
-<!--                        <a href=".?action=archive&amp;categoryId=<?/*= $article->categoryId*/?> ">
-                            <?php /*echo htmlspecialchars(Article::getCategoryName($article->categoryId)['name'] )*/?>
-                        </a>-->
                         <?php if ($article->subcategoryId) { ?>
                         <a href=".?action=archive&amp;subcategoryId=<?= $article->subcategoryId?>">
                             -> <?= htmlspecialchars($results['subcategories'][$article->subcategoryId]->name )?>
@@ -41,16 +38,11 @@
                         <?php } else {?>
                         -> <a href=".?action=archive&amp;subcategoryId=none">Без подкатегорий</a>
                         <?php } ?>
-<!--                        <?php /*$subcategory = Article::getSubcategoryName($article->subcategoryId)*/?>
-
-                        <a href=".?action=archive&amp;subcategoryId=<?/*= $subcategory['id'] */?>">
-                            -> <?php /*echo htmlspecialchars($subcategory['name'] )*/?>
-                        </a>-->
                     </span>
                 <?php } 
                 else { ?>
                     <span class="category">
-                        <?php echo "Без категории"?>
+                        <a href=".?action=archive&amp;categoryId=0">Без категорий</a>
                     </span>
                 <?php } ?>
             </h2>

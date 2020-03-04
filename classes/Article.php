@@ -167,18 +167,24 @@ class Article
 
         $row = $st->fetch();
 
-        /*        $sql = "SELECT user_id, username FROM articles_users" .
-                " JOIN users ON user_id = users.id WHERE article_id = :id";*/
-        $sql = "SELECT user_id FROM articles_users WHERE article_id = :id";
+                $sql = "SELECT user_id, username FROM articles_users" .
+                " JOIN users ON user_id = users.id WHERE article_id = :id";
+//        $sql = "SELECT user_id FROM articles_users WHERE article_id = :id";
         $st = $conn->prepare($sql);
         $st->bindValue(":id", $id, PDO::PARAM_INT);
         $st->execute();
 //        $authors = $st->fetchAll(PDO::FETCH_ASSOC);
-        $authors = $st->fetchAll(PDO::FETCH_COLUMN);
+//        $authors = $st->fetchAll(PDO::FETCH_COLUMN);
+        $authors =[];
+        while ($author = $st->fetch(PDO::FETCH_ASSOC)) {
+            $authors[$author['user_id']] = $author['username'];
+        }
         $conn = null;
 
         if ($row) {
-            $row['authors'] = $authors;
+            if ($authors) {
+                $row['authors'] = $authors;
+            }
             return new Article($row);
         }
     }
@@ -362,23 +368,6 @@ class Article
         return $subcategory->categoryId != $fields['categoryId'] ? 'Error: Subcategory does not belong to selected category' : null;
     }
 
-    public static function getCategoryName($value)
-    {
-        if ($value === '0' || !$value) {
-            return ['name' => 'Без категории', 'id' => '0'];
-        }
-
-        return ['name' => Category::getById($value)->name, 'id' => $value];
-    }
-
-    public static function getSubcategoryName($value)
-    {
-        if (!$value) {
-            return ['name' => 'Без подкатегории', 'id' => 'none'];
-        }
-
-        return ['name' => Subcategory::getById($value)->name, 'id' => $value];
-    }
 
     private function insertAuthors($connection, $articleId, $authors)
     {

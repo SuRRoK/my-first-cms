@@ -18,10 +18,7 @@ d($a);
 $a = array_merge($a, ...$d);
 d($a);*/
 
-//Category::getById(1);
 
-$subcategory = Article::getSubcategoryName(11);
-//dd($subcategory);
 ?>
 
 <?php include "templates/include/footer.php" ?>

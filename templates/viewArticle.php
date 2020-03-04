@@ -10,12 +10,16 @@
         <a href="./?action=archive&amp;categoryId=<?php echo $results['category']->id?>">
             <?php echo htmlspecialchars($results['category']->name) ?>
         </a>
-        <?php $subcategory = Article::getSubcategoryName($results['article']->subcategoryId)?>
-
-        <a href="./?action=archive&amp;subcategoryId=<?= $subcategory['id']?>">
-            -> <?= htmlspecialchars($subcategory['name']) ?>
-        </a>
-    <?php } ?>
+        <?php if ($results['subcategory']->name) { ?>
+            <a href=".?action=archive&amp;subcategoryId=<?= $results['article']->subcategoryId?>">
+                -> <?= htmlspecialchars($results['subcategory']->name )?>
+            </a>
+        <?php } else {?>
+            -> <a href=".?action=archive&amp;subcategoryId=none">Без подкатегорий</a>
+        <?php } ?>
+        <?php if ( $results['article']->authors) { ?>
+        <span> by <?= implode(', ', $results['article']->authors)?></span>
+    <?php } } ?>
         
     </p>
 

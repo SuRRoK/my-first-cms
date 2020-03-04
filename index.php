@@ -14,7 +14,6 @@ try {
     require(TEMPLATE_PATH . "/viewErrorPage.php");
 }
 
-
 function initApplication()
 {
     $action = isset($_GET['action']) ? $_GET['action'] : "";
@@ -71,14 +70,19 @@ function archive()
     
     $results['articles'] = $data['results'];
     $results['totalRows'] = $data['totalRows'];
-    
+
     $data = Category::getList();
     $results['categories'] = array();
-    
+
     foreach ( $data['results'] as $category ) {
         $results['categories'][$category->id] = $category;
     }
-    
+    $data = Subcategory::getList();
+    $results['subcategories'] = [];
+    foreach ( $data['results'] as $subcategory ) {
+        $results['subcategories'][$subcategory->id] = $subcategory;
+    }
+
     $results['pageHeading'] = $results['category'] ?  $results['category']->name : "Article Archive";
     $results['pageTitle'] = $results['pageHeading'] . " | Widget News";
     
@@ -106,6 +110,7 @@ function viewArticle()
     }
     
     $results['category'] = Category::getById($results['article']->categoryId);
+    $results['subcategory'] = Subcategory::getById($results['article']->subcategoryId);
     $results['pageTitle'] = $results['article']->title . " | Простая CMS";
     
     require(TEMPLATE_PATH . "/viewArticle.php");

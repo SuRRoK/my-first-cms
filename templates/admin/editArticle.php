@@ -3,7 +3,7 @@
 
 <?php
 $currentCategory = '';
-//d($results['article']->authors);
+//dd($results['article']->authors);
 //d($results['categories']);
 //dd($results['subcategories'])
 //dd($results['users']) ?>
@@ -76,7 +76,7 @@ $currentCategory = '';
             <select name="authors[]" multiple size="6">
                 <?php foreach ($results['users'] as $user) { ?>
                     <option value="<?= $user->id ?>"<?php
-                    if ($results['article']->authors && in_array($user->id, $results['article']->authors)) {
+                    if ($results['article']->authors && in_array($user->username, $results['article']->authors)) {
                         print ' selected ';
                     }?>><?= htmlspecialchars($user->username) ?></option>
                 <?php } ?>

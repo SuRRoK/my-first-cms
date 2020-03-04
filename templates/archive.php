@@ -9,7 +9,6 @@ if (isset($_GET['subcategoryId']) && $_GET['subcategoryId'] === 'none') {
 ?>
 
     <h1><?php echo htmlspecialchars($results['pageHeading']) ?></h1>
-
 <?php if ($results['category']) { ?>
     <h3 class="categoryDescription"><?php echo htmlspecialchars($results['category']->description) ?></h3>
 <?php } ?>
@@ -34,11 +33,14 @@ if (isset($_GET['subcategoryId']) && $_GET['subcategoryId'] === 'none') {
                             <?php echo htmlspecialchars($results['categories'][$article->categoryId]->name) ?>
                         </a>
 
-                        <?php $subcategory = Article::getSubcategoryName($article->subcategoryId)?>
-
-                        <a href=".?action=archive&amp;subcategoryId=<?= $subcategory['id'] ?>">
-                            -> <?php echo htmlspecialchars($subcategory['name'] )?>
+                        <?php if ($article->subcategoryId) { ?>
+                            <a href=".?action=archive&amp;subcategoryId=<?= $article->subcategoryId?>">
+                            -> <?= htmlspecialchars($results['subcategories'][$article->subcategoryId]->name )?>
                         </a>
+                        <?php } else {?>
+                            -> <a href=".?action=archive&amp;subcategoryId=none">Без подкатегорий</a>
+                        <?php } ?>
+
                     </span>
                     <?php } ?>
                 </h2>
