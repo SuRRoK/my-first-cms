@@ -135,7 +135,7 @@ function homepage()
     $results['articles'] = $data['results'];
     $results['totalRows'] = $data['totalRows'];
     
-/*    $data = Category::getList();
+    $data = Category::getList();
     $results['categories'] = array();
     foreach ( $data['results'] as $category ) { 
         $results['categories'][$category->id] = $category;
@@ -144,7 +144,7 @@ function homepage()
     $results['subcategories'] = [];
     foreach ( $data['results'] as $subcategory ) {
         $results['subcategories'][$subcategory->id] = $subcategory;
-    }*/
+    }
     $results['pageTitle'] = "Простая CMS на PHP";
 
     require(TEMPLATE_PATH . "/homepage.php");
