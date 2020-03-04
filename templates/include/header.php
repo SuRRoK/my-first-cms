@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <title><?php echo htmlspecialchars($results['pageTitle'])?></title>
+    <link rel="shortcut icon" href="images/favicon.png" type="image/png">
     <link rel="stylesheet" type="text/css" href="style.css" />
     <script src="JS/jquery-3.2.1.js"></script>
     <script src="JS/loaderIdentity.js"></script>
