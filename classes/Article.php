@@ -267,7 +267,6 @@ class Article
             . " categoryId=:categoryId, subcategoryId=:subcategoryId, title=:title, summary=:summary,"
             . " content=:content, is_active=:isActive WHERE id = :id";
         $st = $conn->prepare($sql);
-//        dd($this);
         $st->bindValue(":publicationDate", $this->publicationDate, PDO::PARAM_INT);
         $st->bindValue(":categoryId", $this->categoryId, PDO::PARAM_INT);
         $st->bindValue(":subcategoryId", $this->subcategoryId, PDO::PARAM_INT);
@@ -297,4 +296,20 @@ class Article
         $conn = null;
     }
 
+    public static function getCategories() {
+        $data = Category::getList();
+        $results['categories'] = $data['results'];
+        $data = Subcategory::getList();
+        $results['subcategories'] = $data['results'];
+        return $results;
+    }
+
+    public static function checkForm($fields)
+    {
+        if ($fields['subcategoryId'] === '0') {
+            return null;
+        }
+        $subcategory = Subcategory::getById($fields['subcategoryId']);
+        return $subcategory->categoryId != $fields['categoryId'] ? 'Error: Subcategory does not belong to selected category' : null;
+    }
 }

@@ -135,13 +135,14 @@ class Subcategory
     {
         $conn = new PDO( DB_DSN, DB_USERNAME, DB_PASSWORD);
         if ($categoryId) {
-            $where = "WHERE $categoryId = :$categoryId";
+            $where = "WHERE categoryId = :categoryId";
         } else {
             $where = '';
         }
         if ($categoryNames) {
-            $sql = "SELECT SQL_CALC_FOUND_ROWS subcategories.id,subcategories.name, subcategories.description, 
-        categories.name AS categoryName FROM subcategories LEFT JOIN categories ON subcategories.categoryId = categories.id $where ORDER BY categoryId";
+            $sql = "SELECT SQL_CALC_FOUND_ROWS subcategories.id,subcategories.name, subcategories.description, categoryId," .
+        "categories.name AS categoryName FROM subcategories " .
+        "LEFT JOIN categories ON subcategories.categoryId = categories.id $where ORDER BY categoryId";
         } else {
             $sql = "SELECT SQL_CALC_FOUND_ROWS * FROM subcategories " .
                 "$where ORDER BY categoryId";

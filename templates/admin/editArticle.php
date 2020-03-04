@@ -2,9 +2,10 @@
 <?php include "templates/admin/include/header.php" ?>
 
 <?php
+$currentCategory = '';
 //d($results['article']);
 //d($results['categories']);
-//d($results['subcategories']) ?>
+//dd($results['subcategories']) ?>
 
 <h1><?php echo $results['pageTitle'] ?></h1>
 
@@ -51,9 +52,21 @@
             <label for="subcategoryId">Article Subcategory</label>
             <select name="subcategoryId">
                 <option value="0"<?php echo !$results['article']->subcategoryId ? " selected" : "" ?>>Без подкатегории</option>
-                <?php foreach ($results['subcategories'] as $subcategory) { ?>
+                <?php foreach ($results['subcategories'] as $subcategory) {
+                if ($subcategory->categoryName !== $currentCategory) {
+                    if ($currentCategory === '') {
+                        $currentCategory = $subcategory->categoryName; ?>
+                        <optgroup label="<?= $currentCategory ?>">
+                            <option value="<?php echo $subcategory->id ?>"<?php echo ($subcategory->id === $results['article']->subcategoryId) ? " selected" : "" ?>><?php echo htmlspecialchars($subcategory->name) ?></option>
+                    <?php } else {
+                    $currentCategory = $subcategory->categoryName ?>
+                </optgroup>
+                <optgroup label="<?= $currentCategory ?>">
                     <option value="<?php echo $subcategory->id ?>"<?php echo ($subcategory->id === $results['article']->subcategoryId) ? " selected" : "" ?>><?php echo htmlspecialchars($subcategory->name) ?></option>
-                <?php } ?>
+                    <?php }
+                    } else { ?>
+                    <option value="<?php echo $subcategory->id ?>"<?php echo ($subcategory->id === $results['article']->subcategoryId) ? " selected" : "" ?>><?php echo htmlspecialchars($subcategory->name) ?></option>
+                    <?php } }?>
             </select>
         </li>
 

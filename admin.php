@@ -128,20 +128,21 @@ function newArticle() {
     $results['formAction'] = "newArticle";
 
     if ( isset( $_POST['saveChanges'] ) ) {
-//            echo "<pre>";
-//            print_r($results);
-//            print_r($_POST);
-//            echo "<pre>";
 //            В $_POST данные о статье сохраняются корректно
         // Пользователь получает форму редактирования статьи: сохраняем новую статью
-        $article = new Article();
-        $article->storeFormValues( $_POST );
-//            echo "<pre>";
-//            print_r($article);
-//            echo "<pre>";
-//            А здесь данные массива $article уже неполные(есть только Число от даты, категория и полный текст статьи)          
-        $article->insert();
-        header( "Location: admin.php?status=changesSaved" );
+        $checkResult = Article::checkForm($_POST);
+        if (!$checkResult) {
+            $article = new Article;
+            $article->storeFormValues($_POST);
+            $article->insert();
+            header("Location: admin.php?status=changesSaved");
+        } else {
+            $results['errorMessage'] = $checkResult;
+            $results['article'] = new Article;
+            $results['article']->storeFormValues($_POST);
+            $results = array_merge($results, Article::getCategories());
+            require(TEMPLATE_PATH . "/admin/editArticle.php");
+        }
 
     } elseif ( isset( $_POST['cancel'] ) ) {
 
@@ -151,10 +152,7 @@ function newArticle() {
 
         // Пользователь еще не получил форму редактирования: выводим форму
         $results['article'] = new Article;
-        $data = Category::getList();
-        $results['categories'] = $data['results'];
-        $data = Subcategory::getList();
-        $results['subcategories'] = $data['results'];
+        $results = array_merge($results, Article::getCategories());
         require( TEMPLATE_PATH . "/admin/editArticle.php" );
     }
 }
@@ -177,10 +175,17 @@ function editArticle() {
             header( "Location: admin.php?error=articleNotFound" );
             return;
         }
-        $article->storeFormValues( $_POST );
-        $article->update();
-        header( "Location: admin.php?status=changesSaved" );
-
+        $checkResult = Article::checkForm($_POST);
+        if (!$checkResult) {
+            $article->storeFormValues($_POST);
+            $article->update();
+            header("Location: admin.php?status=changesSaved");
+        } else {
+            $results['errorMessage'] = $checkResult;
+            $results['article'] = $article;
+            $results = array_merge($results, Article::getCategories());
+            require(TEMPLATE_PATH . "/admin/editArticle.php");
+        }
     } elseif ( isset( $_POST['cancel'] ) ) {
 
         // Пользователь отказался от результатов редактирования: возвращаемся к списку статей
@@ -189,10 +194,7 @@ function editArticle() {
 
         // Пользвоатель еще не получил форму редактирования: выводим форму
         $results['article'] = Article::getById((int)$_GET['articleId']);
-        $data = Category::getList();
-        $results['categories'] = $data['results'];
-        $data = Subcategory::getList();
-        $results['subcategories'] = $data['results'];
+        $results = array_merge($results, Article::getCategories());
         require(TEMPLATE_PATH . "/admin/editArticle.php");
     }
 
@@ -384,9 +386,6 @@ function editUser()
         } else {
             $results['errorMessage'] = $checkResult;
             $results['user'] = $user;
-//            echo '<pre>';
-//            print_r($user);
-//            die();
             require( TEMPLATE_PATH . "/admin/editUser.php" );
 //            header("Location: admin.php?action=listUsers&error=$checkResult");
         }
@@ -428,7 +427,8 @@ function newUser() {
             header("Location: admin.php?action=listUsers&status=changesSaved");
         } else {
             $results['errorMessage'] = $checkResult;
-            $results['user'] = new User($_POST);
+            $results['user'] = new User;
+            $results['user']->storeFormValues($_POST);
             require( TEMPLATE_PATH . "/admin/editUser.php" );
         }
 

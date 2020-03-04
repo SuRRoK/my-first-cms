@@ -35,6 +35,7 @@ function initApplication()
         'archive' => 'archive',
         'viewArticle' => 'viewArticle',
         'register' => 'register',
+        'test' => 'test',
     ];
 
     isset($indexRoutes[$action]) ? $indexRoutes[$action]() : $indexRoutes['default']();
@@ -171,5 +172,9 @@ function register()
 
         header( "Location: /" );
     }
+}
+
+function test() {
+    require( TEMPLATE_PATH . "/test.php" );
 }
 
