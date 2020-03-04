@@ -3,7 +3,7 @@
 <?php
 $a['trees'] = ['klen', 'topol'];
 
-$b['fruits'] = [
+/*$b['fruits'] = [
     'first' => 'apple',
     'second' => 'orange',
 ];
@@ -16,7 +16,12 @@ $d[] = $b;
 $d[] = $c;
 d($a);
 $a = array_merge($a, ...$d);
-d($a);
+d($a);*/
+
+//Category::getById(1);
+
+$subcategory = Article::getSubcategoryName(11);
+//dd($subcategory);
 ?>
 
 <?php include "templates/include/footer.php" ?>

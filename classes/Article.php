@@ -183,6 +183,9 @@ class Article
         $categoryValue = $categoryId['value'] ?? '';
 
         $categoryClause = $categoryType ? "$categoryType = :$categoryType" : "";
+        if ($categoryType === 'subcategoryId' && $categoryValue === 'none') {
+            $categoryClause = 'subcategoryId IS NULL';
+        }
         $activeClause = !$allArticles ? "is_active = 1" : "";
         $filter = '';
         if ($categoryClause && $activeClause) {
@@ -200,8 +203,9 @@ class Article
 //                        Здесь $st - текст предполагаемого SQL-запроса, причём переменные не отображаются
         $st->bindValue(":numRows", $numRows, PDO::PARAM_INT);
 
-        if ($categoryType)
+        if (($categoryType && $categoryValue !== 'none')) {
             $st->bindValue(":$categoryType", $categoryValue, PDO::PARAM_INT);
+        }
 
         $st->execute(); // выполняем запрос к базе данных
 
@@ -311,5 +315,21 @@ class Article
         }
         $subcategory = Subcategory::getById($fields['subcategoryId']);
         return $subcategory->categoryId != $fields['categoryId'] ? 'Error: Subcategory does not belong to selected category' : null;
+    }
+
+    public static function getCategoryName($value) {
+        if ($value === '0' || !$value) {
+            return ['name' => 'Без категории', 'id' => '0'];
+        }
+
+        return ['name' => Category::getById($value)->name, 'id' => $value];
+    }
+
+    public static function getSubcategoryName($value) {
+        if (!$value) {
+            return ['name' => 'Без подкатегории', 'id' => 'none'];
+        }
+
+        return ['name' => Subcategory::getById($value)->name, 'id' => $value];
     }
 }

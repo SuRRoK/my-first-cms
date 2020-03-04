@@ -45,12 +45,29 @@ function initApplication()
 function archive() 
 {
     $results = [];
+
+    $categoryId = null;
+    if (isset( $_GET['categoryId'] )) {
+        $categoryId = ['type' => 'categoryId', 'value' => (int)$_GET['categoryId']];
+    }
+
+    $subcategoryId = null;
+    if (isset( $_GET['subcategoryId'] )) {
+        $categoryId = ['type' => 'subcategoryId', 'value' => $_GET['subcategoryId']];
+    }
+
+    $results['category'] = isset($_GET['categoryId']) ? Category::getById( $_GET['categoryId'] ) : null;
+    $results['category'] = isset($_GET['subcategoryId']) ? Subcategory::getById( $_GET['subcategoryId'] ) : $results['category'];
+
+    if ($categoryId !== null) {
+        $categoryFilter = $categoryId;
+    } elseif ($subcategoryId !== null) {
+        $categoryFilter = $subcategoryId;
+    } else {
+        $categoryFilter = null;
+    }
     
-    $categoryId = ( isset( $_GET['categoryId'] ) && $_GET['categoryId'] ) ? (int)$_GET['categoryId'] : null;
-    
-    $results['category'] = Category::getById( $categoryId );
-    
-    $data = Article::getList( 100000, $results['category'] ? $results['category']->id : null, false);
+    $data = Article::getList( 100000, $categoryFilter, false);
     
     $results['articles'] = $data['results'];
     $results['totalRows'] = $data['totalRows'];
@@ -118,19 +135,18 @@ function homepage()
     $results['articles'] = $data['results'];
     $results['totalRows'] = $data['totalRows'];
     
-    $data = Category::getList();
+/*    $data = Category::getList();
     $results['categories'] = array();
     foreach ( $data['results'] as $category ) { 
         $results['categories'][$category->id] = $category;
-    } 
-    
+    }
+    $data = Subcategory::getList();
+    $results['subcategories'] = [];
+    foreach ( $data['results'] as $subcategory ) {
+        $results['subcategories'][$subcategory->id] = $subcategory;
+    }*/
     $results['pageTitle'] = "Простая CMS на PHP";
-    
-//    echo "<pre>";
-//    print_r($data);
-//    echo "</pre>";
-//    die();
-    
+
     require(TEMPLATE_PATH . "/homepage.php");
     
 }

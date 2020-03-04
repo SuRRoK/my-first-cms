@@ -34,7 +34,7 @@
             </td>
             <td>
                 <?php
-                if (isset ($article->categoryId)) {
+                if (isset ($article->categoryId) && $article->categoryId !== 0) {
                     echo $results['categories'][$article->categoryId]->name;
                 } else {
                     echo 'Без категории';

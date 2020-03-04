@@ -9,7 +9,9 @@
 <?php if ( isset( $results['statusMessage'] ) ) { ?>
     <div class="statusMessage"><?php echo $results['statusMessage'] ?></div>
 <?php } ?>
-
+<?php
+//    d($results['articles']);
+?>
     <ul id="headlines">
     <?php foreach ($results['articles'] as $article) { ?>
         <li class='<?php echo $article->id?>'>
@@ -25,8 +27,14 @@
                 <?php if (isset($article->categoryId)) { ?>
                     <span class="category">
                         in 
-                        <a href=".?action=archive&amp;categoryId=<?php echo $article->categoryId?>">
-                            <?php echo htmlspecialchars($results['categories'][$article->categoryId]->name )?>
+                        <a href=".?action=archive&amp;categoryId=<?= $article->categoryId?> ">
+                            <?php echo htmlspecialchars(Article::getCategoryName($article->categoryId)['name'] )?>
+                        </a>
+
+                        <?php $subcategory = Article::getSubcategoryName($article->subcategoryId)?>
+
+                        <a href=".?action=archive&amp;subcategoryId=<?= $subcategory['id'] ?>">
+                            -> <?php echo htmlspecialchars($subcategory['name'] )?>
                         </a>
                     </span>
                 <?php } 

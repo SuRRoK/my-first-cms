@@ -10,6 +10,11 @@
         <a href="./?action=archive&amp;categoryId=<?php echo $results['category']->id?>">
             <?php echo htmlspecialchars($results['category']->name) ?>
         </a>
+        <?php $subcategory = Article::getSubcategoryName($results['article']->subcategoryId)?>
+
+        <a href="./?action=archive&amp;subcategoryId=<?= $subcategory['id']?>">
+            -> <?= htmlspecialchars($subcategory['name']) ?>
+        </a>
     <?php } ?>
         
     </p>
