@@ -3,12 +3,12 @@ require ('../config.php');
 
 if (isset($_GET['articleId'])) {
     $article = Article::getById((int)$_GET['articleId']);
-    echo $article->content;
+    echo json_encode($article->content, JSON_THROW_ON_ERROR, 512);
 }
 if (isset ($_POST['articleId'])) {
     //die("Привет)");
     $article = Article::getById((int)$_POST['articleId']);
-    echo json_encode($article);
+    echo json_encode($article->content, JSON_THROW_ON_ERROR, 512);
 //        die("Привет)");
 //    $conn = new PDO( DB_DSN, DB_USERNAME, DB_PASSWORD );
 //    

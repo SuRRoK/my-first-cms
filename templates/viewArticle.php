@@ -10,7 +10,7 @@
         <a href="./?action=archive&amp;categoryId=<?php echo $results['category']->id?>">
             <?php echo htmlspecialchars($results['category']->name) ?>
         </a>
-        <?php if ($results['subcategory']->name) { ?>
+        <?php if ($results['subcategory']) { ?>
             <a href=".?action=archive&amp;subcategoryId=<?= $results['article']->subcategoryId?>">
                 -> <?= htmlspecialchars($results['subcategory']->name )?>
             </a>
