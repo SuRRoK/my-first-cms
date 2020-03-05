@@ -43,6 +43,11 @@ if (isset($_GET['subcategoryId']) && $_GET['subcategoryId'] === 'none') {
 
                     </span>
                     <?php } ?>
+                    <?php if ($article->authors) { ?>
+                        <span class="category">
+                        by <?= implode(', ', $article->authors) ?>
+                    </span>
+                    <?php } ?>
                 </h2>
                 <p class="summary"><?php echo htmlspecialchars($article->summary) ?></p>
             </li>

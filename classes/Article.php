@@ -167,15 +167,15 @@ class Article
 
         $row = $st->fetch();
 
-                $sql = "SELECT user_id, username FROM articles_users" .
-                " JOIN users ON user_id = users.id WHERE article_id = :id";
+        $sql = "SELECT user_id, username FROM articles_users" .
+            " JOIN users ON user_id = users.id WHERE article_id = :id";
 //        $sql = "SELECT user_id FROM articles_users WHERE article_id = :id";
         $st = $conn->prepare($sql);
         $st->bindValue(":id", $id, PDO::PARAM_INT);
         $st->execute();
 //        $authors = $st->fetchAll(PDO::FETCH_ASSOC);
 //        $authors = $st->fetchAll(PDO::FETCH_COLUMN);
-        $authors =[];
+        $authors = [];
         while ($author = $st->fetch(PDO::FETCH_ASSOC)) {
             $authors[$author['user_id']] = $author['username'];
         }
@@ -245,7 +245,22 @@ class Article
         // Получаем общее количество статей, которые соответствуют критерию
         $sql = "SELECT FOUND_ROWS() AS totalRows";
         $totalRows = $conn->query($sql)->fetch();
+
+        $sql = "SELECT article_id, user_id, username FROM articles_users" .
+            " JOIN users ON user_id = users.id ORDER BY article_id";
+        $st = $conn->query($sql);
+
+        $authors = [];
+        while ($author = $st->fetch(PDO::FETCH_ASSOC)) {
+            $authors[$author['article_id']][$author['user_id']] = $author['username'];
+        }
         $conn = null;
+
+        foreach ($list as $article) {
+            if (isset($authors[$article->id])) {
+                $article->authors = $authors[$article->id];
+            }
+        }
 
         return (array(
             "results" => $list,
@@ -281,21 +296,20 @@ class Article
 
         $this->insertAuthors($conn, $this->id, $this->authors);
 
-/*        $authors = '';
-        foreach ($this->authors as $author) {
-            $authors .= "($this->id,$author),";
-        }
-        $sql = "INSERT INTO articles_users (article_id, user_id) VALUES (:authors)";
-        $st = $conn->prepare($sql);
-        $st->bindValue(":authors", mb_substr($authors, 0, -1), PDO::PARAM_STR);
+        /*        $authors = '';
+                foreach ($this->authors as $author) {
+                    $authors .= "($this->id,$author),";
+                }
+                $sql = "INSERT INTO articles_users (article_id, user_id) VALUES (:authors)";
+                $st = $conn->prepare($sql);
+                $st->bindValue(":authors", mb_substr($authors, 0, -1), PDO::PARAM_STR);
 
-        d($authors);
-        d($st);
-        dd(mb_substr($authors, 0, -1));
-        $st->execute();*/
+                d($authors);
+                d($st);
+                dd(mb_substr($authors, 0, -1));
+                $st->execute();*/
         $conn = null;
     }
-
 
 
     /**
@@ -322,7 +336,8 @@ class Article
         $st->bindValue(":id", $this->id, PDO::PARAM_INT);
         $st->bindValue(":isActive", $this->isActive, PDO::PARAM_INT);
         $st->execute();
-
+//        echo 'Model:';
+//        dd($this->id);
         $this->deleteAuthors($conn, $this->id);
         $this->insertAuthors($conn, $this->id, $this->authors);
 
