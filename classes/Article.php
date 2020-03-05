@@ -397,9 +397,9 @@ class Article
 
     private function deleteAuthors($connection, $articleId)
     {
-        $sql = "DELETE FROM articles_users WHERE article_id = :id)";
+        $sql = "DELETE FROM articles_users WHERE article_id = :id";
         $st = $connection->prepare($sql);
-        $st->bindValue(":articleId", $articleId, PDO::PARAM_INT);
+        $st->bindValue(":id", $articleId, PDO::PARAM_INT);
         $st->execute();
     }
 }
