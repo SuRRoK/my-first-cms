@@ -3,6 +3,8 @@ $(function () {
     console.log('Привет, это страый js ))');
     init_get();
     init_post();
+    init_post_new();
+    init_get_new();
 });
 
 function init_get() {
@@ -13,13 +15,12 @@ function init_get() {
         $.ajax({
             method: "GET",
             url: '/ajax/showContentsHandler.php',
-            dataType: 'json',
             data: {'articleId': contentId}
         })
             .done(function (obj) {
                 hideLoaderIdentity();
                 console.log('Ответ получен');
-                $('li.' + contentId).append(obj);
+                $('li.article' + contentId).append(obj);
             })
             .fail(function (xhr, status, error) {
                 hideLoaderIdentity();
@@ -49,13 +50,11 @@ function init_post() {
         })
             .done(function (obj) {
                 hideLoaderIdentity();
-                console.log('Ответ получен', obj);
-                $('li.' + content).append(obj);
+                console.log('Ответ получен');
+                $('li.article' + content).append(obj);
             })
             .fail(function (xhr, status, error) {
                 hideLoaderIdentity();
-
-
                 console.log('Ошибка соединения с сервером (POST)');
                 console.log('ajaxError xhr:', xhr); // выводим значения переменных
                 console.log('ajaxError status:', status);
@@ -67,14 +66,51 @@ function init_post() {
     });
 }
 
-/*function init_post() {
+function  addClicked (elem) {
+    elem.classList.add('clicked');
+}
 
-    let a = document.querySelector('.ajaxArticleBodyByPost');
-    a.addEventListener('click', function (evt) {
-        evt.preventDefault();
-        var contentId = $(this).attr('data-contentId');
-        console.log(contentId);
-        console.log('hello');
+const URL = '/ajax/showContentsHandler.php';
+
+function init_post_new() {
+    let target = 'ajaxNewPost';
+    document.addEventListener('click', function (evt) {
+        if (evt.target.classList.contains(target)  && !evt.target.classList.contains('clicked')) {
+            evt.preventDefault();
+            let articleId = evt.target.dataset.articleId;
+            addClicked(evt.target);
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                console.log(xhr.status);
+                const serverResponse = document.querySelector(`.article${articleId}`);
+                serverResponse.innerHTML += this.response;
+            };
+            xhr.responseType = 'json';
+            xhr.open('POST', URL);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send(`articleId=${encodeURIComponent(articleId)}`);
+        }
     })
 
-}*/
+}
+
+function init_get_new() {
+    let target = 'ajaxNewGet';
+    document.addEventListener('click', function (evt) {
+        if (evt.target.classList.contains(target) && !evt.target.classList.contains('clicked')) {
+            evt.preventDefault();
+            let articleId = evt.target.dataset.articleId;
+            let params = `articleId=${encodeURIComponent(articleId)}`;
+            addClicked(evt.target);
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                console.log(xhr.status);
+                const serverResponse = document.querySelector(`.article${articleId}`);
+                serverResponse.innerHTML += this.response;
+            };
+            xhr.open('GET', `${URL}?${params}`);
+            xhr.send();
+        }
+    })
+
+}

@@ -3,7 +3,8 @@ require ('../config.php');
 
 if (isset($_GET['articleId'])) {
     $article = Article::getById((int)$_GET['articleId']);
-    echo json_encode($article->content, JSON_THROW_ON_ERROR, 512);
+//    echo json_encode($article->content, JSON_THROW_ON_ERROR, 512);
+    echo $article->content;
 }
 if (isset ($_POST['articleId'])) {
     //die("Привет)");
