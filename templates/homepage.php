@@ -45,11 +45,13 @@
                         <a href=".?action=archive&amp;categoryId=0">Без категорий</a>
                     </span>
                 <?php } ?>
-                <?php if ($article->authors) { ?>
+                <button class="btn-show-author" data-articleId="<?= $article->id?>">Show authors</button>
+                <span class="category hidden" id="authors<?= $article->id?>"></span>
+<!--                <?php /*if ($article->authors) { */?>
                     <span class="category">
-                        by <?= implode(', ', $article->authors) ?>
+                        by <?/*= implode(', ', $article->authors) */?>
                     </span>
-                <?php } ?>
+                --><?php /*} */?>
             </h2>
             <p class="summary"><?php echo htmlspecialchars($article->shortContent)?></p>
             <img id="loader-identity" src="JS/ajax-loader.gif" alt="gif">

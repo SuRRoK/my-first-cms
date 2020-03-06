@@ -294,20 +294,19 @@ class Article
 
         $this->id = $conn->lastInsertId();
 
+
+        $authors = '';
+        foreach ($this->authors as $author) {
+            $authors .= "($this->id,$author),";
+        }
+        $authors = mb_substr($authors, 0, -1);
+        $sql = "INSERT INTO articles_users (article_id, user_id) VALUES $authors";
+        $st = $conn->query($sql);
         $this->insertAuthors($conn, $this->id, $this->authors);
-
-        /*        $authors = '';
-                foreach ($this->authors as $author) {
-                    $authors .= "($this->id,$author),";
-                }
-                $sql = "INSERT INTO articles_users (article_id, user_id) VALUES (:authors)";
-                $st = $conn->prepare($sql);
-                $st->bindValue(":authors", mb_substr($authors, 0, -1), PDO::PARAM_STR);
-
-                d($authors);
-                d($st);
-                dd(mb_substr($authors, 0, -1));
-                $st->execute();*/
+/*        $sql = "INSERT INTO articles_users (article_id, user_id) VALUES :authors";
+        $st = $conn->prepare($sql);
+        $st->bindValue(":authors", $authors);
+        $st->execute();*/
         $conn = null;
     }
 

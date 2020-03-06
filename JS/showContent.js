@@ -5,6 +5,7 @@ $(function () {
     init_post();
     init_post_new();
     init_get_new();
+    init_get_author();
 });
 
 function init_get() {
@@ -113,4 +114,34 @@ function init_get_new() {
         }
     })
 
+}
+
+function init_get_author() {
+    $('button.btn-show-author').one('click', function () {
+        let articleId = $(this).attr('data-articleId');
+        let target = $(this);
+        let data = {
+            'articleId': articleId,
+        };
+        showLoaderIdentity();
+        $.ajax({
+            url: '/ajax/showAuthorsHandler.php',
+            data: data,
+            success: function(response) {
+                hideLoaderIdentity();
+                let serverResponse = $(`span#authors${articleId}`);
+                serverResponse.append(response).show();
+                $(target).hide();
+            },
+            error: function (xhr, status, error) {
+                hideLoaderIdentity();
+                console.log('ajaxError xhr:', xhr); // выводим значения переменных
+                console.log('ajaxError status:', status);
+                console.log('ajaxError error:', error);
+
+                console.log('Ошибка соединения при получении данных (GET)');
+            },
+        });
+        return false;
+    });
 }
